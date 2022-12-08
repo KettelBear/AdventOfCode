@@ -21,9 +21,7 @@ defmodule Basin do
     |> Enum.product()
   end
 
-  defp basin(point, grid) do
-    basin(MapSet.new(), point, grid)
-  end
+  defp basin(point, grid), do: basin(MapSet.new(), point, grid)
   defp basin(set, {row, col} = point, grid) do
     if grid[point] in [9, nil] or point in set do
       set
