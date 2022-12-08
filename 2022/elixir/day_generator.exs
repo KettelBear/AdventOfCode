@@ -55,7 +55,15 @@ defmodule Generate do
     def part2 do
       "\#{__DIR__}/input.prod"
       |> Utility.parse_input!()
+
+      -1
     end
+
+    ##############################
+    #                            #
+    #     Used By Both Parts     #
+    #                            #
+    ##############################
   end
   """
 
