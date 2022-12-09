@@ -7,9 +7,17 @@ defmodule Advent.Utility do
   @double_new ["\n\n", "\r\n\r\n"]
 
   @typedoc """
+  `grid` represents a coordinate system that maps to an `integer`. The
+  coordinates will be represented by a touple of `integer`s for the key, and
+  the value is an `integer`.
+  """
+  @type grid :: %{{integer(), integer()} => integer()}
+
+  @typedoc """
   Types that can be returned after parsing the input file.
   """
   @type output :: charlist()
+    | grid()
     | integer()
     | String.t()
     | list(charlist())
@@ -42,11 +50,15 @@ defmodule Advent.Utility do
   ### Stringbreak Options
   Not all Strinbreak Options can be paired with one another. Pairings take
   precedence if the pair exists as a viable set of options, otherwise the
-  options take precedence alphabetically.
+  options take precedence alphabetically, unless explictly stated.
   - `charlist` - (boolean) if `true`, the string input will be returned as a
     charlist. Defaults to `false`
   - `graphemes` - (boolean) if `true`, the string input will be returned as a
     list of single string characters. Can be paired with option, `integers`.
+    Defaults to `false`
+  - `grid` - (boolean) if `true`, the string input will be returned as a map of
+    coordinates to integers (ex. {1, 4} => 2). It will take the highest priority
+    against all options. Cannot be paired with any other Stringbreak option.
     Defaults to `false`
   - `integers` - (boolean) if `true`, the string input will be returned as a
     list of integers. Can be paired with options; `graphemes`, `split`. Defaults
@@ -59,6 +71,7 @@ defmodule Advent.Utility do
   def parse_input!(file_path, opts \\ []) do
     charlist? = Keyword.get(opts, :charlist, false)
     graphemes? = Keyword.get(opts, :graphemes, false)
+    grid? = Keyword.get(opts, :grid, false)
     integers? = Keyword.get(opts, :integers, false)
     splitter = Keyword.get(opts, :split, nil)
 
@@ -67,6 +80,7 @@ defmodule Advent.Utility do
     file_contents = break_lines(file_contents, opts)
 
     cond do
+      grid? -> grid(file_contents)
       graphemes? and integers? -> digits(file_contents)
       integers? and not is_nil(splitter) -> file_contents |> split(splitter) |> numbers()
       charlist? -> chars(file_contents)
@@ -104,6 +118,13 @@ defmodule Advent.Utility do
 
   defp graphemes(contents) when is_list(contents), do: Enum.map(contents, &graphemes/1)
   defp graphemes(contents), do: String.graphemes(contents)
+
+  defp grid(contents) do
+    for {line, row} <- contents |> digits() |> Enum.with_index(),
+        {height, col} <- Enum.with_index(line), into: %{} do
+      {{row, col}, height}
+    end
+  end
 
   defp digits(contents) when is_list(contents), do: Enum.map(contents, &digits/1)
   defp digits(contents), do: contents |> graphemes() |> Enum.map(&stoi/1)

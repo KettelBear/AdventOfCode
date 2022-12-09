@@ -6,12 +6,11 @@ defmodule Advent.Day.Eight do
   @max_idx 98
 
   @doc """
-
+  Consider your map; how many trees are visible from outside the grid?
   """
   def part1 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(graphemes: true, integers: true)
-    |> generate_map()
+    |> Utility.parse_input!(grid: true)
     |> collect_visible()
     |> Enum.count()
   end
@@ -30,7 +29,7 @@ defmodule Advent.Day.Eight do
       Enum.reduce_while(columns, {-1, points}, fn col, {curr_max, s} ->
         height = Map.get(map, {row, col})
         cond do
-          height == 9 and height > curr_max -> {:halt, {9, MapSet.put(s, {row, col})}}
+          height == 9 -> {:halt, {9, MapSet.put(s, {row, col})}}
           height > curr_max -> {:cont, {height, MapSet.put(s, {row, col})}}
           true -> {:cont, {curr_max, s}}
         end
@@ -44,7 +43,7 @@ defmodule Advent.Day.Eight do
       Enum.reduce_while(rows, {-1, points}, fn row, {curr_max, s} ->
         height = Map.get(map, {row, col})
         cond do
-          height == 9 and height > curr_max -> {:halt, {9, MapSet.put(s, {row, col})}}
+          height == 9 -> {:halt, {9, MapSet.put(s, {row, col})}}
           height > curr_max -> {:cont, {height, MapSet.put(s, {row, col})}}
           true -> {:cont, {curr_max, s}}
         end
@@ -54,12 +53,12 @@ defmodule Advent.Day.Eight do
   end
 
   @doc """
-
+  Consider each tree on your map. What is the highest scenic score possible for
+  any tree?
   """
   def part2 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(graphemes: true, integers: true)
-    |> generate_map()
+    |> Utility.parse_input!(grid: true)
     |> highest_scenic_score()
   end
 
@@ -73,51 +72,29 @@ defmodule Advent.Day.Eight do
   defp calculate_scenic(map, {row, col} = point) do
     height = Map.get(map, point)
 
-    up = Enum.reduce_while(row-1..0, 0, fn r, tree_count ->
-      case Map.get(map, {r, col}) do
-        nil -> {:halt, tree_count}
-        h when h >= height -> {:halt, tree_count + 1}
-        _ -> {:cont, tree_count + 1}
-      end
-    end)
-
-    down = Enum.reduce_while(row+1..@max_idx, 0, fn r, tree_count ->
-      case Map.get(map, {r, col}) do
-        nil -> {:halt, tree_count}
-        h when h >= height -> {:halt, tree_count + 1}
-        _ -> {:cont, tree_count + 1}
-      end
-    end)
-
-    left = Enum.reduce_while(col-1..0, 0, fn c, tree_count ->
-      case Map.get(map, {row, c}) do
-        nil -> {:halt, tree_count}
-        h when h >= height -> {:halt, tree_count + 1}
-        _ -> {:cont, tree_count + 1}
-      end
-    end)
-
-    right = Enum.reduce_while(col+1..@max_idx, 0, fn c, tree_count ->
-      case Map.get(map, {row, c}) do
-        nil -> {:halt, tree_count}
-        h when h >= height -> {:halt, tree_count + 1}
-        _ -> {:cont, tree_count + 1}
-      end
-    end)
-
-    up * down * left * right
+    # Up
+    line_product(1, map, height, get_line(col, row-1..0, true))
+    # Down
+    |> line_product(map, height, get_line(col, row+1..@max_idx, true))
+    # Left
+    |> line_product(map, height, get_line(row, col-1..0, false))
+    # Right
+    |> line_product(map, height, get_line(row, col+1..@max_idx, false))
   end
 
-  ##############################
-  #                            #
-  #     Used By Both Parts     #
-  #                            #
-  ##############################
+  defp get_line(const, range, column?) do
+    c_list = const |> List.duplicate(Enum.count(range))
 
-  defp generate_map(tree_heights) do
-    for {line, row} <- Enum.with_index(tree_heights),
-        {height, col} <- Enum.with_index(line), into: %{} do
-      {{row, col}, height}
-    end
+    if column?, do: Enum.zip(range, c_list), else: Enum.zip(c_list, range)
+  end
+
+  defp line_product(product, map, height, line) do
+    product * Enum.reduce_while(line, 0, fn point, count ->
+      if Map.get(map, point) < height do
+        {:cont, count + 1}
+      else
+        {:halt, count + 1}
+      end
+    end)
   end
 end

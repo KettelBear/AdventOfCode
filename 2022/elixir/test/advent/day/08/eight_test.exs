@@ -9,7 +9,7 @@ defmodule Advent.Day.EightTest do
     end
 
     test "solves part 2" do
-      assert Eight.part2() == 201600
+      assert Eight.part2() == 201_600
     end
   end
 end
