@@ -67,7 +67,7 @@ defmodule Advent.Utility do
     split on the delimiter that was passed in. If `nil` it will not split. Can
     be paired with option, `integers`. Defaults to `nil`
   """
-  @spec parse_input!(String.t(), Keyword.t()) :: output()
+  @spec parse_input!(file_path :: String.t(), opts :: Keyword.t()) :: output()
   def parse_input!(file_path, opts \\ []) do
     charlist? = Keyword.get(opts, :charlist, false)
     graphemes? = Keyword.get(opts, :graphemes, false)

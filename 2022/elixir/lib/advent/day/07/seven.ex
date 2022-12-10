@@ -49,11 +49,7 @@ defmodule Advent.Day.Seven do
     need_to_free = Map.get(dir_list, "/").size - (@disk_space - @space_for_update)
 
     Enum.reduce(dir_list, @disk_space, fn {_, %{size: size}}, smallest ->
-      if size - need_to_free > 0 and size < smallest do
-        size
-      else
-        smallest
-      end
+      if size - need_to_free > 0 and size < smallest, do: size, else: smallest
     end)
   end
 
