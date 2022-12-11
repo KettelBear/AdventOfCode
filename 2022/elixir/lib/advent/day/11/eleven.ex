@@ -11,7 +11,9 @@ defmodule Advent.Day.Eleven do
   alias Advent.Utility
 
   @doc """
-
+  Figure out which monkeys to chase by counting how many items they inspect over
+  20 rounds. What is the level of monkey business after 20 rounds of stuff-
+  slinging simian shenanigans?
   """
   def part1 do
     "#{__DIR__}/input.prod"
@@ -22,7 +24,10 @@ defmodule Advent.Day.Eleven do
   end
 
   @doc """
-
+  Worry levels are no longer divided by three after each item is inspected;
+  you'll need to find another way to keep your worry levels manageable. Starting
+  again from the initial state in your puzzle input, what is the level of monkey
+  business after 10000 rounds?
   """
   def part2 do
     "#{__DIR__}/input.prod"
@@ -46,37 +51,37 @@ defmodule Advent.Day.Eleven do
   end
 
   defp keep_away(monkey_map, rounds, manage?) do
+    count = Enum.count(monkey_map)
+
     Enum.reduce(1..rounds, monkey_map, fn _, monkeys ->
-      play_round(monkeys, manage?)
+      for monkey_number <- 0..count-1, reduce: monkeys do
+        m -> inspect_items(m, monkey_number, manage?)
+      end
     end)
-  end
-
-  defp play_round(monkeys, manage?) do
-    count = Enum.count(monkeys)
-
-    for monkey_number <- 0..count-1, reduce: monkeys do
-      m -> inspect_items(m, monkey_number, manage?)
-    end
   end
 
   defp inspect_items(monkeys, monkey_number, manage?) do
     monkey = Map.get(monkeys, monkey_number)
 
+    # It will inspect every item
     inspects = Enum.count(monkey.items)
+
+    # Throw the items to other monkeys
+    monkeys = throw_items(monkey, monkeys, manage?)
+
+    # Items have been thrown, clear items in inventory and sum total inspects.
+    monkey = %{monkey | items: [], inspects: monkey.inspects + inspects}
+
+    Map.put(monkeys, monkey_number, monkey)
+  end
+
+  defp throw_items(monkey, monkeys, manage?) do
     {op, val} = monkey.operation
+    {worry_func, worry_divisor} = worry_management(monkeys, manage?)
 
-    {worry_management, management_value} =
-      if manage? do
-        {&rem/2, Enum.reduce(monkeys, 1, fn {_, %Monkey{test: test}}, product ->
-          product * test
-        end)}
-      else
-        {&div/2, 3}
-      end
-
-    monkeys = Enum.reduce(monkey.items, monkeys, fn item, m ->
+    Enum.reduce(monkey.items, monkeys, fn item, m ->
       val = if val == "old", do: item, else: val
-      worry = op.(item, val) |> worry_management.(management_value)
+      worry = op.(item, val) |> worry_func.(worry_divisor)
       receiving_number =
         if rem(worry, monkey.test) == 0, do: monkey.pass, else: monkey.fail
 
@@ -85,10 +90,15 @@ defmodule Advent.Day.Eleven do
 
       Map.put(m, receiving_number, receiving_monkey)
     end)
+  end
 
-    monkey = %{monkey | items: [], inspects: monkey.inspects + inspects}
+  defp worry_management(_, false), do: {&div/2, 3}
+  defp worry_management(monkeys, true) do
+    divisor = Enum.reduce(monkeys, 1, fn {_, %Monkey{test: test}}, product ->
+      product * test
+    end)
 
-    Map.put(monkeys, monkey_number, monkey)
+    {&rem/2, divisor}
   end
 
   defp build_monkeys(monkeys), do: build_monkeys(Map.new(), monkeys)
@@ -100,15 +110,19 @@ defmodule Advent.Day.Eleven do
 
     monkey = %Monkey{
       operation: format_operation(operation),
-      test: test |> String.split(" ") |> List.last() |> stoi(),
-      pass: pass |> String.split(" ") |> List.last() |> stoi(),
-      fail: fail |> String.split(" ") |> List.last() |> stoi(),
+      test: format_value(test),
+      pass: format_value(pass),
+      fail: format_value(fail),
       items: format_starting_items(starting_items)
     }
 
     map = Map.put(map, number, monkey)
 
     build_monkeys(map, monkeys)
+  end
+
+  defp format_value(str) do
+    str |> String.split(" ") |> List.last() |> stoi()
   end
 
   defp format_operation(op) do
