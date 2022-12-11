@@ -5,6 +5,13 @@ defmodule Advent.Day.Seven do
   alias Advent.Utility
 
   defmodule Directory do
+    @type t :: %__MODULE__{
+      parent: Directory.t() | nil,
+      name: String.t(),
+      size: integer(),
+      dirs: list(String.t()),
+      files: list({String.t(), integer()})
+    }
     @enforce_keys [:name]
     defstruct [:parent, name: "", size: 0, dirs: [], files: []]
   end
