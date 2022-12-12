@@ -10,7 +10,7 @@ defmodule Advent.Day.Eight do
   """
   def part1 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(grid: true)
+    |> Utility.parse_input!(grid: true, integers: true)
     |> collect_visible()
     |> Enum.count()
   end
