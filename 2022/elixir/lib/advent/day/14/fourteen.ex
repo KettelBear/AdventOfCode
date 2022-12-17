@@ -4,7 +4,8 @@ defmodule Advent.Day.Fourteen do
   alias Advent.Utility
 
   @doc """
-
+  Using your scan, simulate the falling sand. How many units of sand come to
+  rest before sand starts flowing into the abyss below?
   """
   def part1 do
     "#{__DIR__}/input.prod"
@@ -27,7 +28,8 @@ defmodule Advent.Day.Fourteen do
   end
 
   @doc """
-
+  Using your scan, simulate the falling sand until the source of the sand
+  becomes blocked. How many units of sand come to rest?
   """
   def part2 do
     "#{__DIR__}/input.prod"
