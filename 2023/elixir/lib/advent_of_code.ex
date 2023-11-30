@@ -1,4 +1,4 @@
-defmodule AdventOfCode2022 do
+defmodule AdventOfCode2023 do
   @moduledoc false
 
   def hello, do: :advent
