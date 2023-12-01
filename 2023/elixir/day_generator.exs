@@ -47,6 +47,8 @@ defmodule Generate do
     def part1 do
       "\#{__DIR__}/input.prod"
       |> Utility.parse_input!()
+
+      -1
     end
 
     @doc """
