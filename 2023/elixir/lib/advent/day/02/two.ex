@@ -5,9 +5,10 @@ defmodule Advent.Day.Two do
   @green 13
   @blue 14
 
-  alias Advent.Utility
+  # String.to_integer() is too long, so use good ol' C's stoi() instead.
+  defdelegate stoi(number), to: String, as: :to_integer
 
-  defdelegate stoi(str), to: String, as: :to_integer
+  alias Advent.Utility
 
   @doc """
   Determine which games would have been possible if the bag had been loaded
@@ -30,13 +31,11 @@ defmodule Advent.Day.Two do
   defp play?(handful) do
     handful
     |> String.split(", ")
-    |> Enum.all?(fn thing ->
-      [num, color] = String.split(thing, " ")
-      n = String.to_integer(num)
-      case color do
-        "red" -> n <= @red
-        "blue" -> n <= @blue
-        "green" -> n <= @green
+    |> Enum.all?(fn num_of_color ->
+      case String.split(num_of_color, " ") do
+        [num, "red"] -> stoi(num) <= @red
+        [num, "green"] -> stoi(num) <= @green
+        [num, "blue"] -> stoi(num) <= @blue
       end
     end)
   end
@@ -45,7 +44,7 @@ defmodule Advent.Day.Two do
     game
     |> String.split(" ")
     |> then(fn [_, n] -> n end)
-    |> String.to_integer()
+    |> stoi()
   end
 
   @doc """
@@ -62,11 +61,11 @@ defmodule Advent.Day.Two do
   defp power([_, handfuls]) do
     handfuls
     |> String.split("; ")
-    |> Enum.reduce({-1, -1, -1}, &max_for_handful/2)
+    |> Enum.reduce({-1, -1, -1}, &max_by_handful/2)
     |> Tuple.product()
   end
 
-  defp max_for_handful(handful, acc) do
+  defp max_by_handful(handful, acc) do
     handful
     |> String.split(", ")
     |> Enum.reduce(acc, fn num_of_color, {r, g, b} ->
