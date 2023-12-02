@@ -5,10 +5,7 @@ defmodule Advent.Day.Two do
   @green 13
   @blue 14
 
-  # String.to_integer() is too long, so use good ol' C's stoi() instead.
-  defdelegate stoi(number), to: String, as: :to_integer
-
-  alias Advent.Utility
+  import Advent.Utility
 
   @doc """
   Determine which games would have been possible if the bag had been loaded
@@ -17,7 +14,7 @@ defmodule Advent.Day.Two do
   """
   def part1 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(split: ": ")
+    |> parse_input!(split: ": ")
     |> Stream.filter(&valid_game?/1)
     |> Stream.map(&game_id/1)
     |> Enum.sum()
@@ -53,7 +50,7 @@ defmodule Advent.Day.Two do
   """
   def part2 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(split: ": ")
+    |> parse_input!(split: ": ")
     |> Stream.map(&power/1)
     |> Enum.sum()
   end

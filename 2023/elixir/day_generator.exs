@@ -39,14 +39,14 @@ defmodule Generate do
   defmodule Advent.Day.{{name}} do
     @moduledoc false
 
-    alias Advent.Utility
+    import Advent.Utility
 
     @doc """
 
     \"""
     def part1 do
       "\#{__DIR__}/input.prod"
-      |> Utility.parse_input!()
+      |> parse_input!()
 
       -1
     end
@@ -56,7 +56,7 @@ defmodule Generate do
     \"""
     def part2 do
       "\#{__DIR__}/input.prod"
-      |> Utility.parse_input!()
+      |> parse_input!()
 
       -1
     end

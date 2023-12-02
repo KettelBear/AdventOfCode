@@ -1,7 +1,7 @@
 defmodule Advent.Day.One do
   @moduledoc false
 
-  alias Advent.Utility
+  import Advent.Utility
 
   @doc """
   Consider your entire calibration document. What is the sum of all of the
@@ -9,7 +9,7 @@ defmodule Advent.Day.One do
   """
   def part1 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(charlist: true)
+    |> parse_input!(charlist: true)
     |> Enum.reduce(0, fn chars, acc ->
       first = find(chars)
       last = chars |> Enum.reverse() |> find()
@@ -24,7 +24,7 @@ defmodule Advent.Day.One do
   """
   def part2 do
     "#{__DIR__}/input.prod"
-    |> Utility.parse_input!(charlist: true)
+    |> parse_input!(charlist: true)
     |> Enum.reduce(0, fn chars, acc ->
       first = find_first(chars)
       last = chars |> Enum.reverse() |> find_last()
