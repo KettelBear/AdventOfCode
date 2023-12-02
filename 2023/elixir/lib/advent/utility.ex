@@ -1,6 +1,8 @@
 defmodule Advent.Utility do
   @moduledoc false
 
+  alias Advent.MultiNoMultiError
+
   defdelegate stoi(str), to: String, as: :to_integer
 
   @newline ["\n", "\r\n"]
@@ -41,47 +43,50 @@ defmodule Advent.Utility do
   ### Linebreak Options
   - `double` - (boolean) if `true`, the input will first be broken by a double
     consecutive newline before being split again by single newline characters.
-    Also, if `true`, the truthyness of `multi` is ignored. Defaults to `false`
+    Also, if `true`, the truthyness of `multi` is ignored. Defaults to `false`.
   - `multi` - (boolean) if `true`, the string input will be broken by a single
     newline character. If `false` (and `double` is `false`) the file contents
     will be returned as a single string read in from the file (unless `integers`
-    is set). Defaults to `true`
+    is set). It will raise `MultiNoMultiError` if set to `false` but the file
+    does contain newline characters. Defaults to `true`.
 
   ### Stringbreak Options
   Not all Strinbreak Options can be paired with one another. Pairings take
   precedence if the pair exists as a viable set of options, otherwise the
   options take precedence alphabetically, unless explictly stated.
   - `charlist` - (boolean) if `true`, the string input will be returned as a
-    charlist. Defaults to `false`
+    charlist. Defaults to `false`.
+  - `digits` - (boolean) if `true`, the string input will be broken down into
+    single characters, then each character converted into an integer type.
+    Defaults to `false`.
   - `graphemes` - (boolean) if `true`, the string input will be returned as a
     list of single string characters. Can be paired with option, `integers`.
-    Defaults to `false`
+    Defaults to `false`.
   - `grid` - (boolean) if `true`, the string input will be returned as a map of
     coordinates to integers (ex. {1, 4} => 2). It will take the highest priority
     against all options. Cannot be paired with any other Stringbreak option.
-    Defaults to `false`
+    Defaults to `false`.
   - `integers` - (boolean) if `true`, the string input will be returned as a
     list of integers. Can be paired with options; `graphemes`, `split`. Defaults
-    to `false`
+    to `false`.
   - `split` - (string) if a string is passed in, the input will attempted to be
     split on the delimiter that was passed in. If `nil` it will not split. Can
-    be paired with option, `integers`. Defaults to `nil`
+    be paired with option, `integers`. Defaults to `nil`.
   """
   @spec parse_input!(file_path :: String.t(), opts :: Keyword.t()) :: output()
   def parse_input!(file_path, opts \\ []) do
     charlist? = Keyword.get(opts, :charlist, false)
+    digits? = Keyword.get(opts, :digits, false)
     graphemes? = Keyword.get(opts, :graphemes, false)
     grid? = Keyword.get(opts, :grid, false)
     integers? = Keyword.get(opts, :integers, false)
     splitter = Keyword.get(opts, :split, nil)
 
-    file_contents = File.read!(file_path)
-
-    file_contents = break_lines(file_contents, opts)
+    file_contents = file_path |> File.read!() |> break_lines(opts)
 
     cond do
       grid? -> grid(file_contents)
-      graphemes? and integers? -> digits(file_contents)
+      digits? -> digits(file_contents)
       integers? and not is_nil(splitter) -> file_contents |> split(splitter) |> numbers()
       charlist? -> chars(file_contents)
       graphemes? -> graphemes(file_contents)
@@ -98,7 +103,7 @@ defmodule Advent.Utility do
     miss_opt? = not multi? and not double? and String.contains?(contents, @newline)
 
     cond do
-      miss_opt? -> raise Advent.MultiNoMultiError
+      miss_opt? -> raise MultiNoMultiError
       double? -> handle_double(contents)
       multi? -> handle_multi(contents)
       true -> contents
@@ -134,53 +139,6 @@ defmodule Advent.Utility do
 
   defp split(contents, splitter) when is_list(contents), do: Enum.map(contents, &split(&1, splitter))
   defp split(contents, splitter), do: String.split(contents, splitter)
-
-  @doc """
-  For 2022, day 5 required a special sort of parsing. So, it has been added to
-  the utility file to keep the solutions themselves concise. Reading the parsing
-  functions should show how convoluted this parsing is.
-  """
-  def parse_day_five(file_path) do
-    file_path
-    |> File.read!()
-    |> String.split(@double_new)
-    |> then(fn input -> input |> parse_stacks() |> parse_instructions() end)
-  end
-
-  defp parse_stacks([stacks, instructions]) do
-    stack_map =
-      stacks
-      |> String.split(@newline, trim: false)
-      |> graphemes()
-      |> Enum.map(&Enum.with_index/1)
-      |> Enum.reverse()
-      |> tl()
-      |> Enum.reduce(%{}, fn row, map ->
-        Enum.reduce(row, map, fn
-          {" ", _}, m -> m
-          {"[", _}, m -> m
-          {"]", _}, m -> m
-          {char, idx}, m ->
-            Map.update(m, calc_idx(idx), [char], fn list -> [char | list] end)
-        end)
-      end)
-
-    {stack_map, instructions}
-  end
-
-  defp calc_idx(n), do: n |> Kernel.-(1) |> Kernel.div(4) |> Kernel.+(1)
-
-  defp parse_instructions({stack_map, instructions}) do
-    parsed_instr =
-      instructions
-      |> String.split(@newline, trim: true)
-      |> Enum.map(&String.split(&1, " ", trim: true))
-      |> Enum.map(fn ["move", num_boxes, "from", start, "to", dest] ->
-        [stoi(num_boxes), stoi(start), stoi(dest)]
-      end)
-
-    {stack_map, parsed_instr}
-  end
 end
 
 defmodule Advent.MultiNoMultiError do

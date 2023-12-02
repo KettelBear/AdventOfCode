@@ -1,6 +1,7 @@
 defmodule Advent.UtilityTest do
   use ExUnit.Case, async: true
 
+  alias Advent.MultiNoMultiError
   alias Advent.Utility
 
   describe "parse_input!" do
@@ -15,7 +16,7 @@ defmodule Advent.UtilityTest do
     end
 
     test "returns a grid of integers" do
-      actual = Utility.parse_input!( "test/data/multi_grapheme_integers.txt", graphemes: true, integers: true)
+      actual = Utility.parse_input!( "test/data/multi_grapheme_integers.txt", digits: true)
 
       assert(actual == [[1, 2, 3], [4, 5, 6]])
     end
@@ -95,7 +96,7 @@ defmodule Advent.UtilityTest do
         Utility.parse_input!("test/data/no_flags_with_multi.txt", multi: false)
         flunk("An exception should have been raised.")
       rescue
-        Advent.MultiNoMultiError -> :ok
+        MultiNoMultiError -> :ok
         _ -> flunk("Caught the wrong error.")
       end
     end
