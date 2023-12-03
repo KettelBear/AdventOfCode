@@ -21,15 +21,15 @@ defmodule Advent.Day.Two do
   end
 
   defp valid_game?([_, handfuls]) do
-    rounds = String.split(handfuls, "; ")
+    rounds = split(handfuls, "; ")
     Enum.all?(rounds, &play?/1)
   end
 
   defp play?(handful) do
     handful
-    |> String.split(", ")
+    |> split(", ")
     |> Enum.all?(fn num_of_color ->
-      case String.split(num_of_color, " ") do
+      case split(num_of_color, " ") do
         [num, "red"] -> stoi(num) <= @red
         [num, "green"] -> stoi(num) <= @green
         [num, "blue"] -> stoi(num) <= @blue
@@ -39,7 +39,7 @@ defmodule Advent.Day.Two do
 
   defp game_id([game, _]) do
     game
-    |> String.split(" ")
+    |> split(" ")
     |> then(fn [_, n] -> n end)
     |> stoi()
   end
@@ -57,16 +57,16 @@ defmodule Advent.Day.Two do
 
   defp power([_, handfuls]) do
     handfuls
-    |> String.split("; ")
+    |> split("; ")
     |> Enum.reduce({-1, -1, -1}, &max_by_handful/2)
     |> Tuple.product()
   end
 
   defp max_by_handful(handful, acc) do
     handful
-    |> String.split(", ")
+    |> split(", ")
     |> Enum.reduce(acc, fn num_of_color, {r, g, b} ->
-      case String.split(num_of_color, " ") do
+      case split(num_of_color, " ") do
         [num, "red"] -> {num |> stoi() |> max(r), g, b}
         [num, "green"] -> {r, num |> stoi() |> max(g), b}
         [num, "blue"] -> {r, g, num |> stoi() |> max(b)}

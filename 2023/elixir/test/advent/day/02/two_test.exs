@@ -5,11 +5,11 @@ defmodule Advent.Day.TwoTest do
 
   describe "Day 2 code" do
     test "solves part 1" do
-      assert Two.part1() == 2528
+      assert Two.part1() == 2_528
     end
 
     test "solves part 2" do
-      assert Two.part2() == 67363
+      assert Two.part2() == 67_363
     end
   end
 end

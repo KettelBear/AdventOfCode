@@ -137,8 +137,8 @@ defmodule Advent.Utility do
   defp numbers(contents) when is_list(contents), do: Enum.map(contents, &numbers/1)
   defp numbers(contents), do: stoi(contents)
 
-  defp split(contents, splitter) when is_list(contents), do: Enum.map(contents, &split(&1, splitter))
-  defp split(contents, splitter), do: String.split(contents, splitter)
+  def split(contents, splitter) when is_list(contents), do: Enum.map(contents, &split(&1, splitter))
+  def split(contents, splitter), do: String.split(contents, splitter)
 end
 
 defmodule Advent.MultiNoMultiError do
