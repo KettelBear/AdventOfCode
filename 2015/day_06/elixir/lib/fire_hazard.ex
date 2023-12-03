@@ -11,7 +11,7 @@ defmodule FireHazard do
   def part1() do
     parse_input("input.prod")
     |> instruction()
-    |> count_on()
+    |> Enum.count(fn {_point, on?} -> on? end)
   end
 
   defp instruction(instr_set), do: instruction(%{}, instr_set)
@@ -27,12 +27,6 @@ defmodule FireHazard do
       end)
     end)
     |> instruction(remaining)
-  end
-
-  defp count_on(grid) do
-    grid
-    |> Enum.filter(fn {_point, on?} -> on? end)
-    |> Enum.count()
   end
 
   def part2() do

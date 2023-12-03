@@ -133,7 +133,7 @@ defmodule Advent.Utility do
   defp numbers(contents), do: stoi(contents)
 
   defp split(contents, splitter) when is_list(contents), do: Enum.map(contents, &split(&1, splitter))
-  defp split(contents, splitter), do: String.split(contents, splitter)
+  defp split(contents, splitter), do: String.split(contents, splitter, trim: true)
 
   @doc """
   For 2022, day 5 required a special sort of parsing. So, it has been added to

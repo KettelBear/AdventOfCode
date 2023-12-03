@@ -61,7 +61,7 @@ defmodule Interns do
   defp nice_2?(word), do: two_pair?(word) and letter_between?(word)
 
   defp two_pair?([_last_pair]), do: false
-  defp two_pair?([pair, overlap | pairs]), do: if Enum.member?(pairs, pair), do: true, else: two_pair?([overlap | pairs])
+  defp two_pair?([pair, overlap | pairs]), do: if(Enum.member?(pairs, pair), do: true, else: two_pair?([overlap | pairs]))
   defp two_pair?(word), do: String.graphemes(word) |> Enum.chunk_every(2, 1, :discard) |> two_pair?()
 
   defp letter_between?([_a, _b]), do: false

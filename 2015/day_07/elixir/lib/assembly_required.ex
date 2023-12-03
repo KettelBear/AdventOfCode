@@ -12,7 +12,7 @@ defmodule AssemblyRequired do
   together: x AND y -> z means to connect wires x and y to an AND gate, and
   then connect its output to wire z.
   """
-  use Bitwise
+  import Bitwise
 
   defdelegate stoi(num_as_str), to: String, as: :to_integer
 

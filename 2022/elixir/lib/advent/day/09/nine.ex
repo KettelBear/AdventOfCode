@@ -68,5 +68,5 @@ defmodule Advent.Day.Nine do
     [hp | follow([new_tp | rest])]
   end
 
-  defp rnd(number), do: if number < 0, do: floor(number), else: ceil(number)
+  defp rnd(number), do: if(number < 0, do: floor(number), else: ceil(number))
 end
