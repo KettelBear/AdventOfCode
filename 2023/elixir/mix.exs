@@ -12,12 +12,8 @@ defmodule AdventOfCode.MixProject do
   end
 
   # Run "mix help compile.app" to learn about applications.
-  def application do
-    []
-  end
+  def application, do: []
 
   # Run "mix help deps" to learn about dependencies.
-  defp deps do
-    []
-  end
+  defp deps, do: []
 end

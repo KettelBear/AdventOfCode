@@ -2,6 +2,8 @@ defmodule Snailfish do
   def part1() do
     parse_input("input.test")
     |> IO.inspect()
+
+    -1
   end
 
   def part2(), do: true
