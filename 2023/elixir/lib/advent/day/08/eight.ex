@@ -38,13 +38,16 @@ defmodule Advent.Day.Eight do
   def part2 do
     {steps, graph} = parse_day8_input!("#{__DIR__}/input.two.test")
 
-    starts = Map.keys(graph) |> Enum.filter(&String.ends_with?(&1, "A"))
-
-    starts
-    |> Enum.reduce([], fn starting_key, acc ->
-      [walk(starting_key, steps, 0, steps, graph) | acc]
-    end)
+    graph
+    |> Map.keys()
+    |> Enum.filter(&String.ends_with?(&1, "A"))
+    |> distances(steps, graph)
     |> lcm()
+  end
+
+  defp distances([], _steps, _graph), do: []
+  defp distances([start | rest], steps, graph) do
+    [walk(start, steps, 0, steps, graph) | distances(rest, steps, graph)]
   end
 
   defp walk(curr_node, [], count, steps, graph), do: walk(curr_node, steps, count, steps, graph)
