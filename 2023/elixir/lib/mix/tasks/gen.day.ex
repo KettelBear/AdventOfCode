@@ -1,11 +1,24 @@
-defmodule Generate do
+defmodule Mix.Tasks.Gen.Day do
   @moduledoc """
-  An elixir script file to generate all the template code for the Advent of Code
+  An elixir script to generate all the template code for the Advent of Code
   day that will be worked on.
   """
 
-  @days_folder "#{__DIR__}/lib/advent/day"
-  @test_folder "#{__DIR__}/test/advent/day"
+  @shortdoc "Generates Advent of Code Day"
+
+  use Mix.Task
+
+  @impl Mix.Task
+  def run([day]) do
+    day_int = String.to_integer(day)
+
+    if day_int < 1 or day_int > 25, do: raise "Failed to pass in proper Advent Day."
+
+    day_int |> create_folders() |> create_files(day_int)
+  end
+
+  @days_folder "lib/advent/day"
+  @test_folder "test/advent/day"
 
   @day_names %{
     1 => "One",
@@ -69,18 +82,6 @@ defmodule Generate do
   end
   """
 
-  @readme """
-  # Day {{number}}: [PASTE DAY TITLE]
-
-  ## Part 1
-
-  [PASTE PART 1]
-
-  ## Part 2
-
-  [PASTE PART 2]
-  """
-
   @test_code """
   defmodule Advent.Day.{{name}}Test do
     use ExUnit.Case
@@ -98,8 +99,6 @@ defmodule Generate do
     end
   end
   """
-
-  def day(day), do: day |> create_folders() |> create_files(day)
 
   defp create_folders(day) do
     folder_name = if day > 9, do: "#{day}", else: "0#{day}"
@@ -121,8 +120,7 @@ defmodule Generate do
 
     code_path
     |> create_code_file(day_name)
-    |> create_input_file()
-    |> create_readme_file(day)
+    |> create_input_files()
 
     create_test_file(test_path, day_name, day)
   end
@@ -137,16 +135,11 @@ defmodule Generate do
     path
   end
 
-  defp create_input_file(path) do
+  defp create_input_files(path) do
     File.write!("#{path}/input.prod", "Paste Input Here")
+    File.write!("#{path}/input.test", "Paste Input Here")
 
     path
-  end
-
-  defp create_readme_file(path, day) do
-    readme_contents = String.replace(@readme, "{{number}}", "#{day}")
-
-    File.write!("#{path}/README.md", readme_contents)
   end
 
   defp create_test_file(path, day_name, day) do
@@ -160,9 +153,3 @@ defmodule Generate do
     File.write!(file, contents)
   end
 end
-
-day = System.argv() |> hd() |> String.to_integer()
-
-if day < 1 or day > 25, do: raise "Failed to pass in proper Advent Day."
-
-Generate.day(day)
